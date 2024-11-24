@@ -3,6 +3,8 @@ from collections import namedtuple
 import cv2
 import mediapipe as mp
 
+from gesplay.constants import Hand
+
 mpHands = mp.solutions.hands
 mpDraw = mp.solutions.drawing_utils
 
@@ -34,9 +36,9 @@ class HandDetector:
             label = results.multi_handedness[hand_idx].classification[0].label
             # Account for inversion in webcam
             if label == "Left":
-                label = "Right"
+                label = Hand.RIGHT.value
             elif label == "Right":
-                label = "Left"
+                label = Hand.LEFT.value
 
             cur_hand_landmarks = []
             hand = results.multi_hand_landmarks[hand_idx]

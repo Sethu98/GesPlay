@@ -4,6 +4,7 @@ import cv2
 import mediapipe as mp
 import pyautogui
 
+from gesplay.constants import Hand
 from gesplay.hand_detector import HandDetector
 from gesture_decoder import GestureDecoder, Gestures
 
@@ -11,11 +12,15 @@ from gesture_decoder import GestureDecoder, Gestures
 class GestureHandler:
     def __init__(self):
         self.active_keys = set()
-        self.gesture_to_key = {}
+        self.gesture_to_key = {
+            (Hand.RIGHT.value, Gestures.PINKY_OUT.value): 'left',
+            (Hand.RIGHT.value, Gestures.THUMB_OUT.value): 'right',
+            (Hand.LEFT.value, Gestures.INDEX_OUT.value): 'space'
+        }
 
     def handle_gestures(self, detected_gestures):
         print("Handling gestures: ", detected_gestures)
-        return
+
         if not detected_gestures:
             # Release all keys when no gestures detected
             for key in list(self.active_keys):
@@ -81,6 +86,7 @@ class GesPlay:
 
                 if gestures:
                     print(gestures)
+                    self.gesture_handler.handle_gestures(gestures)
                 # if landmarks:
                 #     print(landmarks)
             except Exception as e:
