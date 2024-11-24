@@ -1,9 +1,31 @@
 import random
+import threading
 import time
 
-import pyautogui
 import keyboard
-from pynput.keyboard import Key, Controller
+import pyautogui
+
+
+class KeyBoardUtil:
+    @staticmethod
+    def key_down_for_secs(key, secs):
+        # pyautogui.press(key, 20)
+        pyautogui.keyDown(key)
+        time.sleep(secs)
+        pyautogui.keyUp(key)
+
+    def left(self):
+        t = threading.Thread(target=KeyBoardUtil.key_down_for_secs, args=('left', 0.2), daemon=True)
+        t.start()
+
+
+        # self.key_down_for_secs('left', 0.1)
+
+    def right(self):
+        t = threading.Thread(target=KeyBoardUtil.key_down_for_secs, args=('left', 0.2))
+        t.start()
+
+        # self.key_down_for_secs('right', 0.1)
 
 
 def main_py_auto_gui():
@@ -21,7 +43,7 @@ def main_py_auto_gui():
         pyautogui.keyDown(key)
         print('pressed', key)
         time.sleep(1)
-        pyautogui.keyUp('left')
+        pyautogui.keyUp(key)
         print('released', key)
 
 
@@ -30,4 +52,4 @@ def main_keyboard():
     keyboard.write("Well hello there")
 
 
-main_py_auto_gui()
+# main_py_auto_gui()

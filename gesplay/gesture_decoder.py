@@ -1,31 +1,38 @@
 import enum
 
 
+class Hand(enum.Enum):
+    LEFT = 'left'
+    RIGHT = 'right'
+
+
 class Gestures(enum.Enum):
-    LEFT = 0
-    RIGHT = 1
+    INDEX_OUT = 'index_out'
+    THUMB_OUT = 'thumb_out'
+    PINKY_OUT = 'pinky_out'
 
 
 class GestureDecoder:
-    def decode_gesture(self, hand_landmarks, img):
-        # Get index finger base and tip coordinates
-        h, w, _ = img.shape
-        base = hand_landmarks.landmark[5]  # Index finger MCP joint
-        tip = hand_landmarks.landmark[8]  # Index finger tip
+    def decode_gestures(self, hand_landmarks, img):
+        if not hand_landmarks:
+            return []
 
-        # Convert to pixel coordinates
-        base_x = int(base.x * w)
-        tip_x = int(tip.x * w)
+        gestures = []
+        # we will get y coordinate of finger-tip and check if it lies above middle landmark of that finger
+        # details: https://google.github.io/mediapipe/solutions/hands
 
-        # Calculate horizontal difference
-        diff_x = tip_x - base_x
+        if hand_landmarks[4][3] == "Right" and hand_landmarks[4][1] > hand_landmarks[3][1]:  # Right Thumb
+            gestures.append(Gestures.THUMB_OUT)
+        elif hand_landmarks[4][3] == "Left" and hand_landmarks[4][1] < hand_landmarks[3][1]:  # Left Thumb
+            gestures.append(Gestures.THUMB_OUT)
 
-        # Define threshold for direction detection
-        threshold = 30  # Adjust this value based on your needs
+        if hand_landmarks[8][2] < hand_landmarks[6][2]:  # Index finger
+            gestures.append(Gestures.INDEX_OUT)
+        # if hand_landmarks[12][2] < hand_landmarks[10][2]:     #Middle finger
+        #     count = count+1
+        # if hand_landmarks[16][2] < hand_landmarks[14][2]:     #Ring finger
+        #     count = count+1
+        if hand_landmarks[20][2] < hand_landmarks[18][2]:  # Little finger
+            gestures.append(Gestures.PINKY_OUT)
 
-        if diff_x > threshold:
-            return Gestures.LEFT
-        elif diff_x < -threshold:
-            return Gestures.RIGHT
-
-        return None
+        return gestures
