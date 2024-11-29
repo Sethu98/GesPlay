@@ -1,29 +1,45 @@
-from mediapipe.python.solutions.hands import Hands
+import cv2
+import mediapipe as mp
+from mediapipe.tasks import python
 
-from gesplay.constants import Gestures, Hand
+from gesplay.gesture_handler import GestureHandler
+from gesplay.util import Utils
+
+BaseOptions = mp.tasks.BaseOptions
+GestureRecognizer = mp.tasks.vision.GestureRecognizer
+GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
+GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
+VisionRunningMode = mp.tasks.vision.RunningMode
 
 
 class GestureDecoder:
-    def decode_gestures(self, hand_landmarks, img):
-        if not hand_landmarks:
-            return []
+    MODEL_PATH = '../gesture_recognizer.task'
 
-        gestures = []
-        # we will get y coordinate of finger-tip and check if it lies above middle landmark of that finger
-        # details: https://google.github.io/mediapipe/solutions/hands
+    def __init__(self, gesture_handler: GestureHandler):
+        options = GestureRecognizerOptions(
+            base_options=BaseOptions(model_asset_path=self.MODEL_PATH),
+            running_mode=VisionRunningMode.LIVE_STREAM,
+            # running_mode=VisionRunningMode.IMAGE,
+            result_callback=self.process_recognition_result
+        )
+        self.recognizer = GestureRecognizer.create_from_options(options)
+        self.gesture_handler = gesture_handler
 
-        if hand_landmarks[4][3] == Hand.RIGHT.value and hand_landmarks[4][1] > hand_landmarks[3][1]:  # Right Thumb
-            gestures.append(Gestures.THUMB_OUT.value)
-        elif hand_landmarks[4][3] == Hand.LEFT.value and hand_landmarks[4][1] < hand_landmarks[3][1]:  # Left Thumb
-            gestures.append(Gestures.THUMB_OUT.value)
+    def process_recognition_result(self, result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
+        # print(f'gesture recognition result: {result}')
+        gesture_categories = []
 
-        if hand_landmarks[8][2] < hand_landmarks[6][2]:  # Index finger
-            gestures.append(Gestures.INDEX_OUT.value)
-        # if hand_landmarks[12][2] < hand_landmarks[10][2]:     #Middle finger
-        #     count = count+1
-        # if hand_landmarks[16][2] < hand_landmarks[14][2]:     #Ring finger
-        #     count = count+1
-        if hand_landmarks[20][2] < hand_landmarks[18][2]:  # Little finger
-            gestures.append(Gestures.PINKY_OUT.value)
+        for gest in result.gestures:
+            gesture_categories.extend([g.category_name for g in gest])
 
-        return gestures
+        if gesture_categories:
+            self.gesture_handler.handle_gestures(gesture_categories)
+            print(f"gestures = {gesture_categories}")
+
+    def decode_gestures(self, img):
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
+        self.recognizer.recognize_async(mp_image, Utils.get_unix_timestamp_ms())
+        # result = self.recognizer.recognize(mp_image)
+        # self.process_recognition_result(result, None, None)
+
+        return []

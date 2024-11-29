@@ -7,6 +7,11 @@ class Hand(enum.Enum):
 
 
 class Gestures(enum.Enum):
-    INDEX_OUT = 'index_out'
-    THUMB_OUT = 'thumb_out'
-    PINKY_OUT = 'pinky_out'
+    CLOSED_FIST = 'Closed_Fist'
+    OPEN_PALM = 'Open_Palm'
+    POINTING_UP = 'Pointing_Up'
+    THUMB_UP = 'Thumb_Up'
+    THUMB_DOWN = 'Thumb_Down'
+    VICTORY = 'Victory'
+    UNKNOWN = 'Unknown'
+    ILOVEYOU = 'ILoveYou'
