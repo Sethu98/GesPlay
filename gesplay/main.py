@@ -1,3 +1,4 @@
+import threading
 import time
 
 import cv2
@@ -14,7 +15,12 @@ class GesPlay:
             Gestures.POINTING_UP.value: 'left',
             Gestures.THUMB_UP.value: 'right',
             Gestures.OPEN_PALM.value: 'space'
-        })
+        }, None)
+        # self.gesture_handler = GestureHandler(None, {
+        #     Gestures.POINTING_UP.value: 'left',
+        #     Gestures.THUMB_UP.value: 'right',
+        #     Gestures.THUMB_DOWN.value: 'left_click'
+        # })
         self.gesture_decoder = GestureDecoder(self.gesture_handler)
         self.hand_detector = HandDetector()
 
@@ -25,7 +31,12 @@ class GesPlay:
 
         while True:
             success, img = cap.read()
-            self.gesture_decoder.decode_gestures(img)
+
+            # Decode and handler gesture
+            thread = threading.Thread(target=self.gesture_decoder.decode_gestures, args=(img,))
+            thread.start()
+            thread.join()
+
             c_time = time.time()
             fps = 1 / (c_time - p_time)
             p_time = c_time
