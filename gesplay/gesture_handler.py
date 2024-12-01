@@ -32,6 +32,12 @@ class GestureHandler:
                 elif movement_type == MouseMovement.RIGHT:
                     pyautogui.moveRel(50, 0)
 
+    # def handle_keyboard_gestures2(self, detected_gestures):
+    #     for gesture in detected_gestures:
+    #         key = self.gesture_to_key_map.get(gesture)
+    #         if key:
+    #             pyautogui.press(key)
+
     def handle_keyboard_gestures(self, detected_gestures):
         # print("Handling gestures: ", detected_gestures)
 
