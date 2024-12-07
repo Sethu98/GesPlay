@@ -1,4 +1,3 @@
-import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
 
@@ -34,7 +33,7 @@ class GestureDecoder:
 
         if gesture_categories:
             self.gesture_handler.handle_gestures(gesture_categories)
-            print(f"gestures = {gesture_categories}")
+            # print(f"gestures = {gesture_categories}")
 
     def decode_gestures(self, img):
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)

@@ -8,10 +8,13 @@ class MouseMovement:
 
 
 class GestureHandler:
-    def __init__(self, gesture_to_key_map, gesture_to_mouse_map):
+    def __init__(self, gesture_to_key_map, gesture_to_mouse_map=None):
         self.active_keys = set()
         self.gesture_to_key_map = gesture_to_key_map or dict()
         self.gesture_to_mouse_map = gesture_to_mouse_map or dict()
+
+    def set_gesture_to_key_map(self, gesture_to_key_map):
+        self.gesture_to_key_map = gesture_to_key_map
 
     def handle_gestures(self, detected_gestures):
         if self.gesture_to_mouse_map:
