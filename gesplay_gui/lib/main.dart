@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gesplay_gui/api.dart';
+import 'package:gesplay_gui/games_list.dart';
+
+import 'controls_section.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,11 +35,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String? _selectedGame = null;
+  String? _selectedGame;
+  Map<String, String>? _currentGameLayout;
 
-  void _setSelectedGame(String game) {
+  Future<void> _setSelectedGame(String game) async {
+    if(game == _selectedGame) {
+      return;
+    }
+
+    Map<String, dynamic> response = await Api.getLayout(game);
+    Map<String,String>? layout;
+    if(response['success']) {
+      layout = Map<String, String>.from(response['data']);
+    }
+
     setState(() {
       _selectedGame = game;
+      _currentGameLayout = layout;
     });
   }
 
@@ -56,16 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.grey.shade300)),
                 child: Center(
-                  child: Column(
-                    children: [
-                      Text("Wow"),
-                      FloatingActionButton(
-                        onPressed: () => _setSelectedGame,
-                        tooltip: 'Increment',
-                        child: const Icon(Icons.add),
-                      )
-                    ],
-                  ),
+                  child: GamesList(setSelectedGame: _setSelectedGame),
                 ),
               ),
             ),
@@ -77,134 +84,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.grey.shade300)),
                 child: Center(
-                  child: GameControlsSection(gameName: "Mario"),
+                  child: GameControlsSection(
+                      gameName: _selectedGame,
+                      controlLayout: _currentGameLayout),
                 ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class GameControlsSection extends StatelessWidget {
-  final String? gameName;
-  late final Map<String, String> controls;
-
-  GameControlsSection({super.key, required this.gameName}) {
-    controls = {};
-    // Read and store controls map
-  }
-
-  Widget keyboardKeyDisplay(String name) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: Colors.grey.shade400,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade500,
-            offset: Offset(0, 2),
-            blurRadius: 0,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Text(
-        name,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-
-  Widget controlLayoutTable() {
-    final List<String> columnNames = ['Key', 'Gesture'];
-    final Map<String, String> mapping = {
-      "Pointing_Up": "left",
-      "Thumb_Up": "right",
-      "Open_Palm": "up",
-      "Thumb_Down": "down"
-    };
-
-    final List<Map<String, dynamic>> data = mapping.entries
-        .map((entry) => {
-              'key': entry.value,
-              'gesture': entry.key,
-            })
-        .toList();
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          gameName!,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 15),
-        DataTable(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-          ),
-          headingRowColor: MaterialStateProperty.resolveWith(
-            (states) => Colors.blue[100],
-          ),
-          dividerThickness: 2,
-          border: TableBorder.all(
-            color: Colors.black,
-            width: 1,
-          ),
-          columns: columnNames
-              .map((columnName) => DataColumn(
-                    label: Text(
-                      columnName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ))
-              .toList(),
-          rows: data
-              .map(
-                (item) => DataRow(
-                  cells: columnNames.map((columnName) {
-                    String value = item[columnName.toLowerCase()];
-
-                    if (columnName.toLowerCase() == 'key') {
-                      return DataCell(keyboardKeyDisplay(value));
-                    }
-
-                    return DataCell(Text(value));
-                  }).toList(),
-                ),
-              )
-              .toList(),
-        )
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child:
-            gameName == null ? Text("No game selected") : controlLayoutTable(),
       ),
     );
   }
