@@ -67,7 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Expanded(
               child: Container(
-                margin: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.grey.shade300)),
@@ -79,7 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(width: 3),
             Expanded(
               child: Container(
-                margin: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.grey.shade300)),

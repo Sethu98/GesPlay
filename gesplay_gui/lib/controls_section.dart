@@ -11,7 +11,7 @@ class GameControlsSection extends StatelessWidget {
 
   Widget keyboardKeyDisplay(String name) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(6),
@@ -39,7 +39,8 @@ class GameControlsSection extends StatelessWidget {
     );
   }
 
-  Widget controlLayoutTable() {
+  Widget controlLayoutTable(BuildContext context) {
+    final theme = Theme.of(context);
     final List<String> columnNames = ['Key', 'Gesture'];
 
     final List<Map<String, dynamic>> data = controlLayout!.entries
@@ -55,10 +56,10 @@ class GameControlsSection extends StatelessWidget {
       children: [
         Text(
           gameName!,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: Colors.black,
+            color: theme.colorScheme.primary,
           ),
         ),
         const SizedBox(height: 15),
@@ -67,7 +68,7 @@ class GameControlsSection extends StatelessWidget {
             border: Border.all(color: Colors.black),
           ),
           headingRowColor: MaterialStateProperty.resolveWith(
-            (states) => Colors.blue[100],
+            (states) => theme.colorScheme.inversePrimary,
           ),
           dividerThickness: 2,
           border: TableBorder.all(
@@ -115,7 +116,7 @@ class GameControlsSection extends StatelessWidget {
                 ? const Text(
                     "Layout not found",
                   )
-                : controlLayoutTable(),
+                : controlLayoutTable(context),
       ),
     );
   }
