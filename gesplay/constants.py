@@ -15,3 +15,6 @@ class Gestures(enum.Enum):
     VICTORY = 'Victory'
     UNKNOWN = 'Unknown'
     ILOVEYOU = 'ILoveYou'
+
+
+LAYOUTS_FOLDER_PATH = 'layouts'

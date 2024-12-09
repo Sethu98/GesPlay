@@ -16,28 +16,6 @@ from gesture_decoder import GestureDecoder
 
 class GesPlay:
     def __init__(self, gesture_handler: GestureHandler):
-        # # Bubble trouble
-        # self.gesture_handler = GestureHandler({
-        #     Gestures.POINTING_UP.value: 'left',
-        #     Gestures.THUMB_UP.value: 'right',
-        #     Gestures.OPEN_PALM.value: 'space'
-        # }, None)
-
-        # Mophead dash
-        # self.gesture_handler = GestureHandler({
-        #     Gestures.POINTING_UP.value: 'left',
-        #     Gestures.THUMB_UP.value: 'right',
-        #     Gestures.OPEN_PALM.value: 'up',
-        #     Gestures.THUMB_DOWN.value: 'down'
-        # }, None)
-
-        # self.gesture_handler = GestureHandler(None, {
-        #     Gestures.POINTING_UP.value: 'left',
-        #     Gestures.THUMB_UP.value: 'right',
-        #     Gestures.THUMB_DOWN.value: 'left_click'
-        # })
-
-        # Dino game
         self.gesture_handler = gesture_handler
         self.gesture_decoder = GestureDecoder(self.gesture_handler)
         self.hand_detector = HandDetector()
