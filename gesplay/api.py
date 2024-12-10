@@ -1,6 +1,7 @@
 import json
 import os.path
 
+import pyautogui
 import uvicorn
 from fastapi import FastAPI
 
@@ -21,6 +22,15 @@ def error(resp):
         'success': False,
         'error': resp
     }
+
+
+@app.get("/api/games-list")
+def get_games():
+    return success([file.split('.')[0] for file in os.listdir(LAYOUTS_FOLDER_PATH)])
+
+@app.get("/api/keyboard-keys")
+def get_keyboard_keys():
+    return success(pyautogui.KEYBOARD_KEYS)
 
 
 @app.get("/api/layout/{game}")

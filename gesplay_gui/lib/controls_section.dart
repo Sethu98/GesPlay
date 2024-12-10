@@ -1,39 +1,149 @@
 import 'package:flutter/material.dart';
-import 'package:gesplay_gui/api.dart';
+import 'package:dropdown_search/dropdown_search.dart';
+
+import 'constants.dart';
 
 class GameControlsSection extends StatelessWidget {
   final String? gameName;
   final Map<String, String>? controlLayout;
 
-  GameControlsSection({super.key, required this.gameName, required this.controlLayout}) {
+  GameControlsSection(
+      {super.key, required this.gameName, required this.controlLayout}) {
     // Read and store controls map
   }
 
-  Widget keyboardKeyDisplay(String name) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: Colors.grey.shade400,
-          width: 1,
+  Widget keyboardKeyDisplay2(String name) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: 90),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade500,
+              offset: Offset(0, 2),
+              blurRadius: 0,
+              spreadRadius: 0,
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade500,
-            offset: Offset(0, 2),
-            blurRadius: 0,
-            spreadRadius: 0,
+        child: TextField(
+          controller: TextEditingController(text: name),
+          maxLength: 20,
+          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            counterText: "",
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 10,
+            ),
+            isDense: true,
           ),
-        ],
+        ),
       ),
-      child: Text(
-        name,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
+    );
+  }
+
+  Widget keyboardKeyDisplay3(String selectedValue) {
+    //, List<String> items, Function(String?) onChanged) {
+    var items = ['left', 'right', 'up', 'down', '1', '2', '3', 'Unmapped'];
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: 90),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade500,
+              offset: Offset(0, 2),
+              blurRadius: 0,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: DropdownButtonFormField<String>(
+          value: selectedValue,
+          items: items.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (value) => {},
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 10,
+            ),
+            isDense: true,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget keyboardKeyDisplay(String selectedValue) {
+    //, List<String> items, Function(String?) onChanged) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 200),
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        child: DropdownSearch<String>(
+          selectedItem: selectedValue,
+          items: (__, _) => Constants.KEYBOARD_KEYS,
+          popupProps:
+              const PopupProps.menu(showSearchBox: true, fit: FlexFit.loose),
+          dropdownBuilder: (context, selectedItem) {
+            return Center(
+              child: Text(
+                selectedItem ?? '',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: selectedItem == 'Unmapped'
+                      ? FontWeight.normal
+                      : FontWeight.w600,
+                  color: selectedItem == 'Unmapped' ? Colors.grey: Colors.black),
+              ),
+            );
+          },
+          decoratorProps: DropDownDecoratorProps(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[200],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: Colors.grey.shade400,
+                  width: 1,
+                ),
+              ),
+              isDense: true,
+            ),
+          ),
+          onChanged: (value) {
+            // Handle selection
+          },
         ),
       ),
     );
@@ -41,14 +151,14 @@ class GameControlsSection extends StatelessWidget {
 
   Widget controlLayoutTable(BuildContext context) {
     final theme = Theme.of(context);
-    final List<String> columnNames = ['Key', 'Gesture'];
+    final List<String> columnNames = ['Gesture', 'Key'];
 
-    final List<Map<String, dynamic>> data = controlLayout!.entries
-        .map((entry) => {
-              'key': entry.value,
-              'gesture': entry.key,
-            })
-        .toList();
+    // final List<Map<String, dynamic>> data = controlLayout!.entries
+    //     .map((entry) => {
+    //           'gesture': entry.key,
+    //           'key': entry.value,
+    //         })
+    //     .toList();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -86,19 +196,13 @@ class GameControlsSection extends StatelessWidget {
                     ),
                   ))
               .toList(),
-          rows: data
+          rows: Constants.GESTURES
               .map(
-                (item) => DataRow(
-                  cells: columnNames.map((columnName) {
-                    String value = item[columnName.toLowerCase()];
-
-                    if (columnName.toLowerCase() == 'key') {
-                      return DataCell(keyboardKeyDisplay(value));
-                    }
-
-                    return DataCell(Text(value));
-                  }).toList(),
-                ),
+                (gesture) => DataRow(cells: [
+                  DataCell(Text(gesture)),
+                  DataCell(
+                      keyboardKeyDisplay(controlLayout![gesture] ?? 'Unmapped'))
+                ]),
               )
               .toList(),
         )

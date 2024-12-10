@@ -6,7 +6,8 @@ import 'dart:developer';
 class ApiEndpoints {
   static const BASE_URL = "http://127.0.0.1:5000/api";
   static const LAYOUT_ENDPOINT = 'layout';
-
+  static const GAMES_LIST = 'games-list';
+  static const KEYBOARD_KEYS_LIST = 'keyboard-keys';
 }
 
 class Api {
@@ -60,5 +61,13 @@ class Api {
 
   static Future<Map<String, dynamic>> getLayout(String game) async {
     return Api.get('${ApiEndpoints.LAYOUT_ENDPOINT}/$game');
+  }
+
+  static Future<Map<String, dynamic>> getGamesList() async {
+    return Api.get(ApiEndpoints.GAMES_LIST);
+  }
+
+  static Future<Map<String, dynamic>> getKeyboardKeysList() async {
+    return Api.get(ApiEndpoints.KEYBOARD_KEYS_LIST);
   }
 }
