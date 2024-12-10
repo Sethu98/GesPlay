@@ -31,9 +31,12 @@ class UpdateControlsRequest(BaseModel):
     new_key: str
 
 
-def read_layout(game):
-    layout_path = os.path.join(LAYOUTS_FOLDER_PATH, game.lower() + ".json")
+def get_layout_file_path(game):
+    return os.path.join(LAYOUTS_FOLDER_PATH, game.lower() + ".json")
 
+
+def read_layout(game):
+    layout_path = get_layout_file_path(game)
     if not os.path.exists(layout_path):
         return None
 
@@ -42,9 +45,9 @@ def read_layout(game):
         return layout
 
 
-def write_layout(game, layout):
-    layout_path = os.path.join(LAYOUTS_FOLDER_PATH, game.lower() + ".json")
-    if not os.path.exists(layout_path):
+def write_layout(game, layout, create_if_not_exists=False):
+    layout_path = get_layout_file_path(game)
+    if not os.path.exists(layout_path) and not create_if_not_exists:
         return
 
     with open(layout_path, 'w') as handle:
@@ -61,7 +64,7 @@ def get_keyboard_keys():
     return success(pyautogui.KEYBOARD_KEYS)
 
 
-@app.post("/api/update-controls/")
+@app.post("/api/update-controls")
 def update_controls(request: UpdateControlsRequest):
     try:
         layout = read_layout(request.game)
@@ -74,6 +77,21 @@ def update_controls(request: UpdateControlsRequest):
         return success(layout)
     except:
         return error("Failed to update")
+
+
+@app.post("/api/add-game")
+def update_controls(request: dict):
+    try:
+        game = request['game']
+        layout_path = get_layout_file_path(game)
+        if os.path.exists(layout_path):
+            return error("Already exists")
+
+        write_layout(game, {}, create_if_not_exists=True)  # Just write empty layout
+
+        return success("Created")
+    except:
+        return error("Failed to add")
 
 
 @app.get("/api/layout/{game}")
