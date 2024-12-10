@@ -59,9 +59,9 @@ def get_games():
     return success([file.split('.')[0] for file in os.listdir(LAYOUTS_FOLDER_PATH)])
 
 
-@app.get("/api/keyboard-keys")
-def get_keyboard_keys():
-    return success(pyautogui.KEYBOARD_KEYS)
+# @app.get("/api/keyboard-keys")
+# def get_keyboard_keys():
+#     return success(pyautogui.KEYBOARD_KEYS)
 
 
 @app.post("/api/update-controls")
@@ -71,11 +71,14 @@ def update_controls(request: UpdateControlsRequest):
         if layout is None:
             return error("Game not found")
 
-        layout[request.gesture] = layout[request.new_key]
+        layout[request.gesture] = request.new_key
         write_layout(request.game, layout)
 
+        print(f"Updated controls for request: {request}")
+
         return success(layout)
-    except:
+    except Exception as e:
+        print(f"Error while updating controls: {e}")
         return error("Failed to update")
 
 

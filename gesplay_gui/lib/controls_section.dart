@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:gesplay_gui/api.dart';
 
 import 'constants.dart';
 
@@ -12,7 +13,7 @@ class GameControlsSection extends StatelessWidget {
     // Read and store controls map
   }
 
-  Widget keyboardKeyDisplay(String selectedValue) {
+  Widget keyboardKeyDisplay(String gesture, String selectedValue) {
     //, List<String> items, Function(String?) onChanged) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 200),
@@ -51,7 +52,7 @@ class GameControlsSection extends StatelessWidget {
             ),
           ),
           onChanged: (value) {
-            // Handle selection
+            Api.updateControls(gameName!, gesture, value!);
           },
         ),
       ),
@@ -103,7 +104,7 @@ class GameControlsSection extends StatelessWidget {
                 (gesture) => DataRow(cells: [
                   DataCell(Text(gesture)),
                   DataCell(
-                      keyboardKeyDisplay(controlLayout![gesture] ?? 'Unmapped'))
+                      keyboardKeyDisplay(gesture, controlLayout![gesture] ?? 'Unmapped'))
                 ]),
               )
               .toList(),

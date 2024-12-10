@@ -7,7 +7,6 @@ class ApiEndpoints {
   static const BASE_URL = "http://127.0.0.1:5000/api";
   static const LAYOUT_ENDPOINT = 'layout';
   static const GAMES_LIST = 'games-list';
-  static const KEYBOARD_KEYS_LIST = 'keyboard-keys';
   static const UPDATE_CONTROLS = 'update-controls';
   static const ADD_GAME = 'add-game';
 }
@@ -69,17 +68,13 @@ class Api {
     return Api.get(ApiEndpoints.GAMES_LIST);
   }
 
-  static Future<Map<String, dynamic>> getKeyboardKeysList() async {
-    return Api.get(ApiEndpoints.KEYBOARD_KEYS_LIST);
-  }
-
   static Future<Map<String, dynamic>> addGame(String gameName) async {
     return Api.post(ApiEndpoints.ADD_GAME, body: {'game': gameName});
   }
 
   static Future<Map<String, dynamic>> updateControls(
       String gameName, String gesture, String newKey) async {
-    return Api.post(ApiEndpoints.KEYBOARD_KEYS_LIST,
+    return Api.post(ApiEndpoints.UPDATE_CONTROLS,
         body: {'game': gameName, 'gesture': gesture, 'new_key': newKey});
   }
 }
