@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from gesplay.constants import LAYOUTS_FOLDER_PATH
+from gesplay.util import Utils
 
 app = FastAPI()
 
@@ -31,29 +32,6 @@ class UpdateControlsRequest(BaseModel):
     new_key: str
 
 
-def get_layout_file_path(game):
-    return os.path.join(LAYOUTS_FOLDER_PATH, game.lower() + ".json")
-
-
-def read_layout(game):
-    layout_path = get_layout_file_path(game)
-    if not os.path.exists(layout_path):
-        return None
-
-    with open(layout_path) as handle:
-        layout = json.loads(handle.read())
-        return layout
-
-
-def write_layout(game, layout, create_if_not_exists=False):
-    layout_path = get_layout_file_path(game)
-    if not os.path.exists(layout_path) and not create_if_not_exists:
-        return
-
-    with open(layout_path, 'w') as handle:
-        handle.write(json.dumps(layout, indent=4))
-
-
 @app.get("/api/games-list")
 def get_games():
     return success([file.split('.')[0] for file in os.listdir(LAYOUTS_FOLDER_PATH)])
@@ -67,12 +45,16 @@ def get_games():
 @app.post("/api/update-controls")
 def update_controls(request: UpdateControlsRequest):
     try:
-        layout = read_layout(request.game)
+        layout = Utils.read_layout(request.game)
         if layout is None:
             return error("Game not found")
 
-        layout[request.gesture] = request.new_key
-        write_layout(request.game, layout)
+        if request.new_key == 'Unmapped':
+            layout.pop(request.gesture)
+        else:
+            layout[request.gesture] = request.new_key
+
+        Utils.write_layout(request.game, layout)
 
         print(f"Updated controls for request: {request}")
 
@@ -83,30 +65,48 @@ def update_controls(request: UpdateControlsRequest):
 
 
 @app.post("/api/add-game")
-def update_controls(request: dict):
+def add_game(request: dict):
     try:
         game = request['game']
-        layout_path = get_layout_file_path(game)
+        layout_path = Utils.get_layout_file_path(game)
         if os.path.exists(layout_path):
             return error("Already exists")
 
-        write_layout(game, {}, create_if_not_exists=True)  # Just write empty layout
+        Utils.write_layout(game, {}, create_if_not_exists=True)  # Just write empty layout
 
         return success("Created")
     except:
         return error("Failed to add")
 
 
+@app.post("/api/remove-game")
+def remove_game(request: dict):
+    try:
+        game = request['game']
+        layout_path = Utils.get_layout_file_path(game)
+        if not os.path.exists(layout_path):
+            return error("Does not exist")
+
+        os.remove(layout_path)
+        print(f"Removed game: {game}")
+
+        return success("Deleted")
+    except Exception as e:
+        print(f"Error while removing game: {e}")
+        return error("Failed to add")
+
+
 @app.get("/api/layout/{game}")
 def get_control_layout(game: str):
     try:
-        layout = read_layout(game)
+        layout = Utils.read_layout(game)
 
         if layout is None:
             return error("Game not found")
 
         return success(layout)
-    except:
+    except Exception as e:
+        print(f"Error while fetching controls: {e}")
         return error("Failed to fetch controls")
 
 

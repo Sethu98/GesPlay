@@ -22,6 +22,7 @@ class _GamesListState extends State<GamesList> {
   }
 
   void fetchGames() async {
+    print("Fetching games list");
     var response = await Api.getGamesList();
     if (!response['success']) {
       return;
@@ -84,6 +85,14 @@ class _GamesListState extends State<GamesList> {
     );
   }
 
+  Future<void> removeGame(String gameName) async {
+    var resp = await Api.removeGame(gameName);
+    print(resp);
+    if(resp['success']) {
+      fetchGames();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -105,7 +114,7 @@ class _GamesListState extends State<GamesList> {
                 border: Border.all(color: Colors.grey),
               ),
               child: ScrollableCardList(
-                  items: gamesList, setSelectedGame: widget.setSelectedGame),
+                  items: gamesList, setSelectedItem: widget.setSelectedGame, removeItem: removeGame),
             ),
           ),
           Padding(
@@ -124,11 +133,35 @@ class _GamesListState extends State<GamesList> {
 }
 
 class ScrollableCardList extends StatelessWidget {
-  final Future<void> Function(String game) setSelectedGame;
+  final Future<void> Function(String game) setSelectedItem;
+  final Future<void> Function(String game) removeItem;
   final List<String> items;
 
   const ScrollableCardList(
-      {super.key, required this.items, required this.setSelectedGame});
+      {super.key, required this.items, required this.setSelectedItem, required this.removeItem});
+
+  Future<bool?> showDeleteConfirmation(BuildContext context, String item) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete "$item"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,14 +173,31 @@ class ScrollableCardList extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           child: ListTile(
             title: Text(items[index]),
-            trailing: IconButton(
-              icon: const Icon(
-                Icons.play_arrow_rounded,
-                color: Colors.green,
-              ),
-              onPressed: () {
-                setSelectedGame(items[index]);
-              },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.green,
+                  ),
+                  onPressed: () {
+                    setSelectedItem(items[index]);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.redAccent,
+                  ),
+                  onPressed: () async {
+                    final shouldDelete = await showDeleteConfirmation(context, items[index]);
+                    if (shouldDelete == true) {
+                      removeItem(items[index]);
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         );

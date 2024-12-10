@@ -9,6 +9,7 @@ class ApiEndpoints {
   static const GAMES_LIST = 'games-list';
   static const UPDATE_CONTROLS = 'update-controls';
   static const ADD_GAME = 'add-game';
+  static const REMOVE_GAME = 'remove-game';
 }
 
 class Api {
@@ -70,6 +71,10 @@ class Api {
 
   static Future<Map<String, dynamic>> addGame(String gameName) async {
     return Api.post(ApiEndpoints.ADD_GAME, body: {'game': gameName});
+  }
+
+  static Future<Map<String, dynamic>> removeGame(String gameName) async {
+    return Api.post(ApiEndpoints.REMOVE_GAME, body: {'game': gameName});
   }
 
   static Future<Map<String, dynamic>> updateControls(
