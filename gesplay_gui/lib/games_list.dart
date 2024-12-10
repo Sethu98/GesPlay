@@ -27,15 +27,20 @@ class _GamesListState extends State<GamesList> {
       return;
     }
 
+    print(response);
+
     setState(() {
       games = List<String>.from(response['data']);
     });
+
+    if(games.isNotEmpty) {
+      widget.setSelectedGame(games[0]);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    widget.setSelectedGame("Mario");
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +58,7 @@ class _GamesListState extends State<GamesList> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
               ),
-              child: ScrollableCardList(items: games),
+              child: ScrollableCardList(items: games, setSelectedGame: widget.setSelectedGame),
             ),
           ),
           Padding(
@@ -70,11 +75,13 @@ class _GamesListState extends State<GamesList> {
 }
 
 class ScrollableCardList extends StatelessWidget {
+  final Future<void> Function(String game) setSelectedGame;
   final List<String> items;
 
   const ScrollableCardList({
     super.key,
     required this.items,
+    required this.setSelectedGame
   });
 
   @override
@@ -93,7 +100,7 @@ class ScrollableCardList extends StatelessWidget {
                 color: Colors.green,
               ),
               onPressed: () {
-                // Handle edit action
+                setSelectedGame(items[index]);
               },
             ),
           ),

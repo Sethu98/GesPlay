@@ -39,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, String>? _currentGameLayout;
 
   Future<void> _setSelectedGame(String game) async {
+    print(game);
     if(game == _selectedGame) {
       return;
     }
