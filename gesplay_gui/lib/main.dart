@@ -44,6 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
 
+    Api.setCurrentGame(game);
+
     Map<String, dynamic> response = await Api.getLayout(game);
     Map<String,String>? layout;
     if(response['success']) {

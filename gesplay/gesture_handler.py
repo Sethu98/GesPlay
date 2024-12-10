@@ -14,6 +14,7 @@ class GestureHandler:
         self.gesture_to_mouse_map = gesture_to_mouse_map or dict()
 
     def set_gesture_to_key_map(self, gesture_to_key_map):
+        print(f"Setting gesture to key map: {gesture_to_key_map}")
         self.gesture_to_key_map = gesture_to_key_map
 
     def handle_gestures(self, detected_gestures):

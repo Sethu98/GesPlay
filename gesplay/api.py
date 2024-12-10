@@ -1,15 +1,22 @@
-import json
 import os.path
 
-import pyautogui
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 from gesplay.constants import LAYOUTS_FOLDER_PATH
+from gesplay.gesture_handler import GestureHandler
+from gesplay.gp import GesPlay
 from gesplay.util import Utils
 
 app = FastAPI()
+
+class AppState:
+    def __init__(self):
+        self.current_game = None
+        self.gesture_handler = GestureHandler({})
+
+app_state = AppState()
 
 
 def success(resp):
@@ -44,6 +51,8 @@ def get_games():
 
 @app.post("/api/update-controls")
 def update_controls(request: UpdateControlsRequest):
+    print("Current game: ", app_state.current_game)
+
     try:
         layout = Utils.read_layout(request.game)
         if layout is None:
@@ -57,6 +66,9 @@ def update_controls(request: UpdateControlsRequest):
         Utils.write_layout(request.game, layout)
 
         print(f"Updated controls for request: {request}")
+
+        if request.game == app_state.current_game:
+            app_state.gesture_handler.set_gesture_to_key_map(layout)
 
         return success(layout)
     except Exception as e:
@@ -110,9 +122,40 @@ def get_control_layout(game: str):
         return error("Failed to fetch controls")
 
 
-def start_server():
+@app.post("/api/set-current-game")
+def set_current_game(request: dict):
+    game = request['game']
+    app_state.current_game = game
+    layout = Utils.read_layout(game)
+
+    if layout:
+        app_state.gesture_handler.set_gesture_to_key_map(layout)
+
+
+# @app.post("/api/start-gesplay")
+# def start_gesplay():
+#     print(app.state.gesplay)
+#     if app.state.gesplay:
+#         return error("Already running")
+#
+#     gesplay = GesPlay(GESTURE_HANDLER)
+#     gesplay.start()
+#     print("Started gesplay")
+#     app.state.gesplay = gesplay
+#     print(app.state.gesplay)
+
+
+# @app.post("/api/stop-gesplay")
+# def stop_gesplay():
+#     if not app.state.gesplay:
+#         return error("Not running")
+#
+#     app.state.gesplay.stop()
+#     app.state.gesplay = None
+
+
+def start_http_server():
     uvicorn.run(app, host="127.0.0.1", port=5000)
 
-
-if __name__ == "__main__":
-    start_server()
+# if __name__ == "__main__":
+#     start_http_server()
