@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'api.dart';
 
@@ -88,7 +89,7 @@ class _GamesListState extends State<GamesList> {
   Future<void> removeGame(String gameName) async {
     var resp = await Api.removeGame(gameName);
     print(resp);
-    if(resp['success']) {
+    if (resp['success']) {
       fetchGames();
     }
   }
@@ -103,7 +104,7 @@ class _GamesListState extends State<GamesList> {
           "Games",
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: theme.colorScheme.inversePrimary,
+        // backgroundColor: theme.colorScheme.inversePrimary,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
       body: Column(
@@ -114,7 +115,9 @@ class _GamesListState extends State<GamesList> {
                 border: Border.all(color: Colors.grey),
               ),
               child: ScrollableCardList(
-                  items: gamesList, setSelectedItem: widget.setSelectedGame, removeItem: removeGame),
+                  items: gamesList,
+                  setSelectedItem: widget.setSelectedGame,
+                  removeItem: removeGame),
             ),
           ),
           Padding(
@@ -138,7 +141,10 @@ class ScrollableCardList extends StatelessWidget {
   final List<String> items;
 
   const ScrollableCardList(
-      {super.key, required this.items, required this.setSelectedItem, required this.removeItem});
+      {super.key,
+      required this.items,
+      required this.setSelectedItem,
+      required this.removeItem});
 
   Future<bool?> showDeleteConfirmation(BuildContext context, String item) {
     return showDialog<bool>(
@@ -172,7 +178,10 @@ class ScrollableCardList extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           child: ListTile(
-            title: Text(items[index]),
+            title: Text(
+              items[index],
+              style: GoogleFonts.habibi(), //GoogleFonts.aboreto(),
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -191,7 +200,8 @@ class ScrollableCardList extends StatelessWidget {
                     color: Colors.redAccent,
                   ),
                   onPressed: () async {
-                    final shouldDelete = await showDeleteConfirmation(context, items[index]);
+                    final shouldDelete =
+                        await showDeleteConfirmation(context, items[index]);
                     if (shouldDelete == true) {
                       removeItem(items[index]);
                     }

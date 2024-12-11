@@ -15,46 +15,44 @@ class GameControlsSection extends StatelessWidget {
 
   Widget keyboardKeyDisplay(String gesture, String selectedValue) {
     //, List<String> items, Function(String?) onChanged) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 200),
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        child: DropdownSearch<String>(
-          selectedItem: selectedValue,
-          items: (__, _) => Constants.KEYBOARD_KEYS,
-          popupProps:
-              const PopupProps.menu(showSearchBox: true, fit: FlexFit.loose),
-          dropdownBuilder: (context, selectedItem) {
-            return Center(
-              child: Text(
-                selectedItem ?? '',
-                textAlign: TextAlign.center,
-                style: TextStyle(
+    return Container(
+      padding: const EdgeInsets.all(5),
+      child: DropdownSearch<String>(
+        selectedItem: selectedValue,
+        items: (__, _) => Constants.KEYBOARD_KEYS,
+        popupProps:
+            const PopupProps.menu(showSearchBox: true, fit: FlexFit.loose),
+        dropdownBuilder: (context, selectedItem) {
+          return Center(
+            child: Text(
+              selectedItem ?? '',
+              textAlign: TextAlign.center,
+              style: TextStyle(
                   fontWeight: selectedItem == 'Unmapped'
                       ? FontWeight.normal
                       : FontWeight.w600,
-                  color: selectedItem == 'Unmapped' ? Colors.grey: Colors.black),
-              ),
-            );
-          },
-          decoratorProps: DropDownDecoratorProps(
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[200],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: Colors.grey.shade400,
-                  width: 1,
-                ),
-              ),
-              isDense: true,
+                  color:
+                      selectedItem == 'Unmapped' ? Colors.grey : Colors.black),
             ),
+          );
+        },
+        decoratorProps: DropDownDecoratorProps(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: Colors.grey.shade400,
+                width: 1,
+              ),
+            ),
+            isDense: true,
           ),
-          onChanged: (value) {
-            Api.updateControls(gameName!, gesture, value!);
-          },
         ),
+        onChanged: (value) {
+          Api.updateControls(gameName!, gesture, value!);
+        },
       ),
     );
   }
@@ -103,8 +101,8 @@ class GameControlsSection extends StatelessWidget {
               .map(
                 (gesture) => DataRow(cells: [
                   DataCell(Text(gesture)),
-                  DataCell(
-                      keyboardKeyDisplay(gesture, controlLayout![gesture] ?? 'Unmapped'))
+                  DataCell(keyboardKeyDisplay(
+                      gesture, controlLayout![gesture] ?? 'Unmapped'))
                 ]),
               )
               .toList(),

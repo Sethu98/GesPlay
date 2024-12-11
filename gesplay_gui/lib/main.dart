@@ -60,9 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: theme.colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: Center(
@@ -74,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade300)),
+                    border: Border.all(color: theme.colorScheme.inversePrimary, width: 2)), // Colors.grey.shade300)),
                 child: Center(
                   child: GamesList(setSelectedGame: _setSelectedGame),
                 ),
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade300)),
+                    border: Border.all(color: theme.colorScheme.inversePrimary, width: 2)),
                 child: Center(
                   child: GameControlsSection(
                       gameName: _selectedGame,
