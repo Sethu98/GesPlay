@@ -3,18 +3,28 @@ import os.path
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
 
 from gesplay.constants import LAYOUTS_FOLDER_PATH
 from gesplay.gesture_handler import GestureHandler
-from gesplay.gp import GesPlay
 from gesplay.util import Utils
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class AppState:
     def __init__(self):
         self.current_game = None
         self.gesture_handler = GestureHandler({})
+
 
 app_state = AppState()
 
@@ -130,28 +140,6 @@ def set_current_game(request: dict):
 
     if layout:
         app_state.gesture_handler.set_gesture_to_key_map(layout)
-
-
-# @app.post("/api/start-gesplay")
-# def start_gesplay():
-#     print(app.state.gesplay)
-#     if app.state.gesplay:
-#         return error("Already running")
-#
-#     gesplay = GesPlay(GESTURE_HANDLER)
-#     gesplay.start()
-#     print("Started gesplay")
-#     app.state.gesplay = gesplay
-#     print(app.state.gesplay)
-
-
-# @app.post("/api/stop-gesplay")
-# def stop_gesplay():
-#     if not app.state.gesplay:
-#         return error("Not running")
-#
-#     app.state.gesplay.stop()
-#     app.state.gesplay = None
 
 
 def start_http_server():
