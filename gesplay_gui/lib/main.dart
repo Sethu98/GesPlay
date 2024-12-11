@@ -41,15 +41,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _setSelectedGame(String game) async {
     print(game);
-    if(game == _selectedGame) {
+    if (game == _selectedGame) {
       return;
     }
 
     Api.setCurrentGame(game);
 
     Map<String, dynamic> response = await Api.getLayout(game);
-    Map<String,String>? layout;
-    if(response['success']) {
+    Map<String, String>? layout;
+    if (response['success']) {
       layout = Map<String, String>.from(response['data']);
     }
 
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: theme.colorScheme.inversePrimary, width: 2)), // Colors.grey.shade300)),
+                    border: Border.all(color: Colors.grey.shade300)),
                 child: Center(
                   child: GamesList(setSelectedGame: _setSelectedGame),
                 ),
@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: theme.colorScheme.inversePrimary, width: 2)),
+                    border: Border.all(color: Colors.grey.shade300)),
                 child: Center(
                   child: GameControlsSection(
                       gameName: _selectedGame,
