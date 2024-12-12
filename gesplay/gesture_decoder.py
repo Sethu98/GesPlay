@@ -1,31 +1,44 @@
-import enum
+import mediapipe as mp
+from mediapipe.tasks import python
 
+from gesplay.gesture_handler import GestureHandler
+from gesplay.util import Utils
 
-class Gestures(enum.Enum):
-    LEFT = 0
-    RIGHT = 1
+BaseOptions = mp.tasks.BaseOptions
+GestureRecognizer = mp.tasks.vision.GestureRecognizer
+GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
+GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
+VisionRunningMode = mp.tasks.vision.RunningMode
 
 
 class GestureDecoder:
-    def decode_gesture(self, hand_landmarks, img):
-        # Get index finger base and tip coordinates
-        h, w, _ = img.shape
-        base = hand_landmarks.landmark[5]  # Index finger MCP joint
-        tip = hand_landmarks.landmark[8]  # Index finger tip
+    MODEL_PATH = '../gesture_recognizer.task'
 
-        # Convert to pixel coordinates
-        base_x = int(base.x * w)
-        tip_x = int(tip.x * w)
+    def __init__(self, gesture_handler: GestureHandler):
+        options = GestureRecognizerOptions(
+            base_options=BaseOptions(model_asset_path=self.MODEL_PATH),
+            running_mode=VisionRunningMode.LIVE_STREAM,
+            # running_mode=VisionRunningMode.IMAGE,
+            result_callback=self.process_recognition_result
+        )
+        self.recognizer = GestureRecognizer.create_from_options(options)
+        self.gesture_handler = gesture_handler
 
-        # Calculate horizontal difference
-        diff_x = tip_x - base_x
+    def process_recognition_result(self, result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
+        # print(f'gesture recognition result: {result}')
+        gesture_categories = []
 
-        # Define threshold for direction detection
-        threshold = 30  # Adjust this value based on your needs
+        for gest in result.gestures:
+            gesture_categories.extend([g.category_name for g in gest])
 
-        if diff_x > threshold:
-            return Gestures.LEFT
-        elif diff_x < -threshold:
-            return Gestures.RIGHT
+        if gesture_categories:
+            self.gesture_handler.handle_gestures(gesture_categories)
+            # print(f"gestures = {gesture_categories}")
 
-        return None
+    def decode_gestures(self, img):
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
+        self.recognizer.recognize_async(mp_image, Utils.get_unix_timestamp_ms())
+        # result = self.recognizer.recognize(mp_image)
+        # self.process_recognition_result(result, None, None)
+
+        return []
