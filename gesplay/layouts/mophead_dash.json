@@ -1,6 +1,6 @@
 {
     "Pointing_Up": "left",
-    "Thumb_Down": "right",
-    "Thumb_Up": "up",
-    "Open_Palm": "down"
+    "Thumb_Down": "down",
+    "Thumb_Up": "right",
+    "Open_Palm": "up"
 }

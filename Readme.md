@@ -2,7 +2,7 @@
 
 Gesplay is a hand gesture based video game controller that can be used to play any game with simple control layouts. It's built in Python and uses OpenCV, Google Mediapipe's hand tracking libraries and Pyautogui.
 
-## Running the frontend
+## Frontend
 
 ### Install flutter
 Follow [this](https://docs.flutter.dev/get-started/install) to install flutter.
@@ -13,7 +13,7 @@ cd gesplay_gui
 flutter run -d chrome
 ```
 
-## Running the backend
+## Backend
 ```bash
 # Create virtual environment
 python3 -m venv .venv
